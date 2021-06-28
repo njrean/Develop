@@ -97,7 +97,7 @@ class Optionbox(Textbox):
         self.selected = selection
         self.start_draw = False
         self.option_active = -1
-    def display2(self, screen):
+    def display_option(self, screen):
         py.draw.rect(screen, (255, 211, 69) if self.active and not self.start_draw else (212, 211, 233), self.rec)
         text = self.font.render(self.option_list[self.selected], 1, (81, 81, 81))
         screen.blit(text, text.get_rect(center = self.rec.center))
@@ -128,11 +128,10 @@ class Optionbox(Textbox):
                 self.start_draw = False
 
 class Window:
-    def __init__(self,x, y, w, h, screen_on, background):
+    def __init__(self,x, y, w, h, screen_on):
         self.surf = py.Surface((w, h), py.SRCALPHA)
         self.pos = (x, y)
         self.screen_on = screen_on
-        self.background = py.image.load(ob_resource+background)
         self.list_button = []
         self.list_textbox = []
         self.list_intxt = []
@@ -140,7 +139,7 @@ class Window:
     def display(self):
         for textbox in self.list_textbox: textbox.display(self.surf)
         for intxt in self.list_intxt: intxt.draw(self.surf)
-        for optionbox in self.list_optionbox: optionbox.display2(self.surf)
+        for optionbox in self.list_optionbox: optionbox.display_option(self.surf)
         self.screen_on.blit(self.surf, self.pos)
     def all_update(self, event):
         for button in self.list_button: button.mouse_detect()
@@ -299,10 +298,10 @@ class Game:
         
         self.calculate = ValuseSet()
         #!!own surface
-        self.main_surf = Window(0, 0, 1165, 720, self.screen, 'main_background.png')
-        self.graph_surf = Window(335, 387, 819, 324, self.screen, 'graph_background.png')
-        self.simulate_surf = Window(335, 56, 814, 309, self.screen, 'simulate_background.png')
-        self.export_surf = Window(257.5, 185, 650, 350, self.screen, 'ex_background.png')
+        self.main_surf = Window(0, 0, 1165, 720, self.screen)
+        self.graph_surf = Window(335, 387, 819, 324, self.screen)
+        self.simulate_surf = Window(335, 56, 814, 309, self.screen)
+        self.export_surf = Window(257.5, 185, 650, 350, self.screen)
 
          #!!in main window
         self.screen.fill((217, 217, 222)) #fill color of screen
