@@ -1,9 +1,6 @@
 import pygame as py
 from pygame import Vector2 as V2
 import math
-from pygame import image
-from pygame.event import get
-from pygame.transform import rotate, scale
 from os import path
 import csv
 
@@ -34,29 +31,22 @@ def savefile_append_row(name, header, data):
     f.close()
 
 class Button:
-    def __init__(self, name, x, y, screen_on, screen_pos = (0,0)):
+    def __init__(self, name, x, y, screen_pos = (0,0)):
         self.positon = (x, y)
-        self.button = py.image.load("{}/{}.png".format('object/', name))
-        self.selected = py.image.load("{}/{}.2.png".format('object/', name))
+        self.button = py.image.load(ob_resource + name+'.png')
+        self.selected = py.image.load(ob_resource + name+'.2.png')
         self.ob = self.button.get_rect(topleft=(x+screen_pos[0],y+screen_pos[1])) #for get postion
         self.state = False
-        self.screen_on = screen_on
-        self.screen_pos = screen_pos
     def blit(self, screen, check):
-        if check or self.state:
-            screen.blit(self.selected, self.positon)
-        else:
-            screen.blit(self.button, self.positon)
+        if check or self.state: screen.blit(self.selected, self.positon)
+        else: screen.blit(self.button, self.positon)
     def mouse_detect(self):
-        if self.ob.collidepoint(py.mouse.get_pos()):
-            self.state = True
-        else: self.state = False
+        self.state = True if self.ob.collidepoint(py.mouse.get_pos()) else False
     def mouse_click(self, event):
-        if self.ob.collidepoint(event.pos):
-            return True
+        if self.ob.collidepoint(event.pos): return True
 
 class Textbox:
-    def __init__(self, x, y, w, h, font, fsize, fcolor, text = '', allow = True, general_active = False, screen_pos = (0,0)):
+    def __init__(self, x, y, w, h, font, fsize, fcolor, text ='', screen_pos=(0,0)):
         self.rec = py.Rect(x, y, w, h)
         self.rec2 = py.Rect(x+screen_pos[0], y+screen_pos[1], w, h)
         self.font = py.font.Font(font, fsize)
@@ -66,21 +56,21 @@ class Textbox:
         self.text = text
         self.text_sur = self.font.render(self.text, True, self.fcolor)
         self.active = False
-        self.allow = allow
-        self.general_active = general_active
-    def draw(self, screen, border=10, width=1, color=None):
+    def draw(self, screen, color=None):
         self.text_sur = self.font.render(self.text, True, self.fcolor)
-        py.draw.rect(screen, color or self.fcolor, self.rec, width, border_radius=border)
+        py.draw.rect(screen, color or self.fcolor, self.rec, 1, border_radius=10)
         screen.blit(self.text_sur, self.text_sur.get_rect(center = self.rec.center))
-    def display(self, screen, textcolor = (81, 81, 81), boxcolor = 'white', bordercolor = (112, 112, 112), border=3, width = 0):
+    def display(self, screen, textcolor = (81, 81, 81), boxcolor = 'white', bordercolor = (112, 112, 112), border=3):
         self.text_sur = self.font.render(self.text, True, textcolor)
-        py.draw.rect(screen, boxcolor, self.rec, width, border_radius=border)
+        py.draw.rect(screen, boxcolor, self.rec, 0, border_radius=border)
         py.draw.rect(screen, bordercolor, self.rec, 1, border_radius=border)
         screen.blit(self.text_sur, self.text_sur.get_rect(center = self.rec.center))
         
 class Intxt(Textbox):
-    def __intit__(self, x, y, w, h, font, fsize, fcolor):
-        super().__init__(self, x, y, w, h, font, fsize, fcolor, text = '')
+    def __init__(self, x, y, w, h, font, fsize, fcolor, text, screen_pos, allow=True, general_active=True):
+        super().__init__(x, y, w, h, font, fsize, fcolor, text, screen_pos)
+        self.allow = allow
+        self.general_active = general_active
     def check_event(self, event):
         if self.allow:
             if event.type == py.MOUSEBUTTONDOWN:
@@ -100,8 +90,8 @@ class Intxt(Textbox):
                         self.text += event.unicode
 
 class Optionbox(Textbox):
-    def __init__(self, x, y, w, h, font, fsize, fcolor, text, allow, option_list , unit_list, selection = 0, screen_pos = (0,0)):
-        super().__init__(x, y, w, h, font, fsize, fcolor, text=text, allow=allow, screen_pos=screen_pos)
+    def __init__(self, x, y, w, h, font, fsize, fcolor, text, option_list , unit_list, selection = 0, screen_pos = (0,0)):
+        super().__init__(x, y, w, h, font, fsize, fcolor, text, screen_pos=screen_pos)
         self.option_list = option_list
         self.unit_list = unit_list
         self.selected = selection
@@ -142,7 +132,7 @@ class Window:
         self.surf = py.Surface((w, h), py.SRCALPHA)
         self.pos = (x, y)
         self.screen_on = screen_on
-        self.background = py.image.load('object//'+background)
+        self.background = py.image.load(ob_resource+background)
         self.list_button = []
         self.list_textbox = []
         self.list_intxt = []
@@ -159,8 +149,8 @@ class Window:
         
 class Cannon:
     def __init__(self):
-        self.arm_cannon = py.image.load('object//arm_cannon.png')
-        self.base_cannon = py.image.load('object//base_cannon.png')
+        self.arm_cannon = py.image.load(ob_resource+'arm_cannon.png')
+        self.base_cannon = py.image.load(ob_resource+'base_cannon.png')
         self.angle = 0
     def cannon_status(self, angle):
         return True if self.angle == angle else False
@@ -212,10 +202,10 @@ class Ball:
         self.update()
         for i, x in enumerate(self.pos_scale[0][0]):
             screen1.blit(self.scale_line_x, (x, 677-392))
-            self.pos_scale[0][1][i].draw(screen1, 0, 0, 'white')
+            self.pos_scale[0][1][i].draw(screen1, 'white')
         for i, y in enumerate(self.pos_scale[1][0]):
             screen1.blit(self.scale_line_y, (399-335, y))
-            self.pos_scale[1][1][i].draw(screen1, 0, 0, 'white')
+            self.pos_scale[1][1][i].draw(screen1, 'white')
         for i in self.list:
             py.draw.circle(screen1, (0, 0, 0), [404-335+(i[1]*self.ratio), 677.5-392-(i[2]*self.ratio)], 2)
         surfaceball.surf.blit(self.ball, [413-surfaceball.pos[0]+(87*math.cos(self.a))+(self.pos.x*257.14), 277-surfaceball.pos[1]-(87*math.sin(self.a))-(self.pos.y*257)+(self.in_pos.y*257)])
@@ -306,6 +296,7 @@ class Game:
         self.clock = py.time.Clock() #limit frame rate
         
     def setting(self):
+        
         self.calculate = ValuseSet()
         #!!own surface
         self.main_surf = Window(0, 0, 1165, 720, self.screen, 'main_background.png')
@@ -317,11 +308,11 @@ class Game:
         self.screen.fill((217, 217, 222)) #fill color of screen
         self.main_background = py.image.load(ob_resource +'main_background.png')
         #Button
-        self.start = Button('start', 116, 352,  self.main_surf.surf) #Start
-        self.reset = Button('reset', 202, 413, self.main_surf.surf) #Reset
-        self.angle = Button('angle', 42, 124, self.main_surf.surf) #Angle
-        self.spring = Button('spring', 178, 124, self.main_surf.surf) #Spring
-        self.export = Button('export', 202, 669, self.main_surf.surf) #Export
+        self.start = Button('start', 116, 352) #Start
+        self.reset = Button('reset', 202, 413) #Reset
+        self.angle = Button('angle', 42, 124) #Angle
+        self.spring = Button('spring', 178, 124) #Spring
+        self.export = Button('export', 202, 669) #Export
         #BoxOuput 
         self.out_angle = Textbox(20, 499, 113, 20, input_font, 14, (81, 81, 81))
         self.out_displace = Textbox(177, 499, 113, 20, input_font, 14, (81, 81, 81))
@@ -332,10 +323,10 @@ class Game:
         self.out_ymax = Textbox(20, 609, 113, 20, input_font, 14, (81, 81, 81))
         self.out_warning = Textbox(42, 171, 229, 25, input_font, 14, (81, 81, 81))
         #BoxInput
-        self.box_ad = Intxt(44, 205, 126, 36, input_font, 20, (112, 112, 112), "", False) #input angle or spring displacement
-        self.box_dis = Intxt(145, 253, 126, 36, input_font, 20, (112, 112, 112), "", True) #input distance
-        self.box_unit1 = Optionbox(145, 300, 46, 27, input_font, 13, (81, 81, 81), '', True, ['mm', 'cm', 'm'], [10**-3, 10**-2, 1], 2)
-        self.box_unit2 = Optionbox(178, 211, 46, 24, input_font, 13, (81, 81, 81), '', True, ['-'], [1], 0)
+        self.box_ad = Intxt(44, 205, 126, 36, input_font, 20, (112, 112, 112), "", (0, 0), False, False) #input angle or spring displacement
+        self.box_dis = Intxt(145, 253, 126, 36, input_font, 20, (112, 112, 112), "", (0, 0), True, False) #input distance
+        self.box_unit1 = Optionbox(145, 300, 46, 27, input_font, 13, (81, 81, 81), '', ['mm', 'cm', 'm'], [10**-3, 10**-2, 1], 2)
+        self.box_unit2 = Optionbox(178, 211, 46, 24, input_font, 13, (81, 81, 81), '', ['-'], [1])
         self.main_surf.list_button = [self.start, self.reset, self.angle, self.angle, self.spring, self.export] 
         self.main_surf.list_textbox = [self.out_angle, self.out_displace, self.out_distance, self.out_velocity, self.out_time, self.out_xmax, self.out_ymax, self.out_warning]
         self.main_surf.list_intxt = [self.box_ad, self.box_dis]
@@ -347,17 +338,17 @@ class Game:
 
         #!!in export window
         self.ex_background = py.image.load(ob_resource +'ex_background.png')
-        self.ex_quit = Button('ex_quit', 607, 10, self.export_surf.surf, self.export_surf.pos)
-        self.ex_graph = Button('ex_graph', 52, 111, self.export_surf.surf, self.export_surf.pos)
-        self.ex_value = Button('ex_value', 258, 111, self.export_surf.surf, self.export_surf.pos)
-        self.ex_result = Button('ex_result', 464, 111, self.export_surf.surf, self.export_surf.pos)
-        self.ex_confirm = Button('ex_confirm', 255, 287, self.export_surf.surf, self.export_surf.pos)
-        self.file_name = Intxt(161, 217, 268, 36, input_font, 14, (112, 112, 112), '', True, True, self.export_surf.pos)
-        self.file_type = Optionbox(442, 217, 50, 36, input_font, 14, (81, 81, 81), '', True, [''], [''], 0, self.export_surf.pos)
+        self.ex_quit = Button('ex_quit', 607, 10, self.export_surf.pos)
+        self.ex_graph = Button('ex_graph', 52, 111, self.export_surf.pos)
+        self.ex_value = Button('ex_value', 258, 111, self.export_surf.pos)
+        self.ex_result = Button('ex_result', 464, 111, self.export_surf.pos)
+        self.ex_confirm = Button('ex_confirm', 255, 287, self.export_surf.pos)
+        self.file_name = Intxt(161, 217, 268, 36, input_font, 14, (112, 112, 112), '', self.export_surf.pos)
+        self.file_type = Optionbox(442, 217, 50, 36, input_font, 14, (81, 81, 81), '', [''], [''], 0, self.export_surf.pos)
         self.export_surf.list_button = [self.ex_quit, self.ex_graph, self.ex_value, self.ex_result, self.ex_confirm]
         self.export_surf.list_intxt = [self.file_name]
         self.export_surf.list_optionbox = [self.file_type]
-
+      
     def render_dp(self, but_check, ex_check):
         #!!main surface
         self.main_surf.surf.blit(self.main_background, (0, 0)) #background
