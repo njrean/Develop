@@ -2,7 +2,6 @@ import pygame as py
 from pygame import Vector2 as V2
 import math
 from pygame import image
-#from pygame.display import set_allow_screensaver
 from pygame.event import get
 from pygame.transform import rotate, scale
 from os import path
