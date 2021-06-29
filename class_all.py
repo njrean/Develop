@@ -141,7 +141,7 @@ class Window:
         for intxt in self.list_intxt: intxt.draw(self.surf)
         for optionbox in self.list_optionbox: optionbox.display_option(self.surf)
         self.screen_on.blit(self.surf, self.pos)
-    def all_update(self, event):
+    def __all_update(self, event):
         for button in self.list_button: button.mouse_detect()
         for intxt in self.list_intxt: intxt.check_event(event)
         for optionbox in self.list_optionbox: optionbox.update(event)
@@ -294,8 +294,7 @@ class Game:
         self.screen = py.display.set_mode((sc_x, sc_y))
         self.clock = py.time.Clock() #limit frame rate
         
-    def setting(self):
-        
+    def __setting(self):
         self.calculate = ValuseSet()
         #!!own surface
         self.main_surf = Window(0, 0, 1165, 720, self.screen)
@@ -348,7 +347,7 @@ class Game:
         self.export_surf.list_intxt = [self.file_name]
         self.export_surf.list_optionbox = [self.file_type]
       
-    def render_dp(self, but_check, ex_check):
+    def __render_dp(self, but_check, ex_check):
         #!!main surface
         self.main_surf.surf.blit(self.main_background, (0, 0)) #background
         self.angle.blit(self.main_surf.surf ,but_check[0])
@@ -378,17 +377,17 @@ class Game:
             self.ex_confirm.blit(self.export_surf.surf, False)
             self.export_surf.display()
 
-    def update(self, event, but_check):
+    def __update(self, event, but_check):
         if not but_check[2]:
-            self.main_surf.all_update(event)
+            self.main_surf._Window__all_update(event)
         else:
-            self.export_surf.all_update(event)
+            self.export_surf._Window__all_update(event)
 
-    def run(self):
+    def __run(self):
         running = True
         but_check = [False, False, False, False] #button angle, spring, export, check simulate
         ex_check = [False, False, False] #export window graph, value, result
-        self.setting()
+        self.__setting()
        
         while running:
             if but_check[0] or but_check[1]:
@@ -405,7 +404,7 @@ class Game:
                 self.out_warning.text = 'Select Angle or Displacement'
             
             for event in py.event.get():
-                self.update(event, but_check)  
+                self.__update(event, but_check)  
                 if event.type == py.MOUSEBUTTONDOWN:
                     if self.angle.mouse_click(event) and not but_check[2]: #want to find angle 
                         but_check[0] = not but_check[0]
@@ -475,7 +474,7 @@ class Game:
                     py.quit()
                     exit()
 
-            self.render_dp(but_check, ex_check)
+            self.__render_dp(but_check, ex_check)
 
             py.display.update() #update display
             self.clock.tick(60)
