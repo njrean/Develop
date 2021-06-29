@@ -5,11 +5,39 @@ from os import path
 import csv
 
 ob_resource = 'object/'
-input_font = 'font/BAHNSCHRIFT.ttf'
+input_font = 'otherfile/BAHNSCHRIFT.ttf'
 list_resutout = ['distance(m)', 'angle(degree)', 'spring displacement(m)', 'initial y-axis(m)',
                 'highest y-axis(m)', 'farthest x-axis(m)', 'time at highest-point(s)', 'time at farthest-point(s)',
                 'time at basket(s)', 'initial velocity(m/s)', 'collided velocity(m/s)', 'spring constant(N/m)',
                 'mass of ball(kg)', 'mass of collided part(kg)']
+file_info = 'otherfile/info.txt'
+
+def multilineRender(screen, name, x,y, font, colour=(128,128,128), justification="left"):
+    f = open(name, 'r')
+    text = f.readlines()
+    text = '\n'.join(text)
+    f.close()
+    text = text.strip().replace('\r','').split('\n')
+    justification = justification[0].upper()
+    max_width = 0
+    text_bitmaps = []
+    font = py.font.Font(font, 12)
+    # Convert all the text into bitmaps, calculate the justification width
+    for t in text:
+        text_bitmap = font.render(t, True, colour)
+        text_width  = text_bitmap.get_width()
+        text_bitmaps.append((text_width, text_bitmap))
+        if (max_width < text_width): max_width = text_width
+    # Paint all the text bitmaps to the screen with justification
+    for (width, bitmap) in text_bitmaps:
+        xpos = x
+        width_diff = max_width - width
+        if (justification == 'R'):  # right-justify
+            xpos = x + width_diff
+        elif (justification == 'C'): # centre-justify
+            xpos = x + (width_diff // 2)
+        screen.blit(bitmap, (xpos, y) )
+        y += bitmap.get_height()
 
 def savefile_append_row(name, header, data):
     lines = 0
@@ -387,6 +415,7 @@ class Game:
         #!!info surface
         elif but_check[4]:
             self.info_surf.surf.blit(self.info_background, (0,0))
+            multilineRender(self.info_surf.surf, file_info, 32, 75, input_font, (81, 81, 81))
             self.info_quit.blit(self.info_surf.surf, False)
             self.info_surf.display()
 
