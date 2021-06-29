@@ -301,6 +301,7 @@ class Game:
         self.graph_surf = Window(335, 387, 819, 324, self.screen)
         self.simulate_surf = Window(335, 56, 814, 309, self.screen)
         self.export_surf = Window(257.5, 185, 650, 350, self.screen)
+        self.info_surf = Window(257.5, 185, 650, 350, self.screen)
 
          #!!in main window
         self.screen.fill((217, 217, 222)) #fill color of screen
@@ -311,6 +312,7 @@ class Game:
         self.angle = Button('angle', 42, 124) #Angle
         self.spring = Button('spring', 178, 124) #Spring
         self.export = Button('export', 202, 669) #Export
+        self.info = Button('info', 1093, 15)
         #BoxOuput 
         self.out_angle = Textbox(20, 499, 113, 20, input_font, 14, (81, 81, 81))
         self.out_displace = Textbox(177, 499, 113, 20, input_font, 14, (81, 81, 81))
@@ -325,7 +327,7 @@ class Game:
         self.box_dis = Intxt(145, 253, 126, 36, input_font, 20, (112, 112, 112), "", (0, 0), True, False) #input distance
         self.box_unit1 = Optionbox(145, 300, 46, 27, input_font, 13, (81, 81, 81), '', ['mm', 'cm', 'm'], [10**-3, 10**-2, 1], 2)
         self.box_unit2 = Optionbox(178, 211, 46, 24, input_font, 13, (81, 81, 81), '', ['-'], [1])
-        self.main_surf.list_button = [self.start, self.reset, self.angle, self.angle, self.spring, self.export] 
+        self.main_surf.list_button = [self.start, self.reset, self.angle, self.angle, self.spring, self.export, self.info] 
         self.main_surf.list_textbox = [self.out_angle, self.out_displace, self.out_distance, self.out_velocity, self.out_time, self.out_xmax, self.out_ymax, self.out_warning]
         self.main_surf.list_intxt = [self.box_ad, self.box_dis]
         self.main_surf.list_optionbox = [self.box_unit1, self.box_unit2]
@@ -336,7 +338,7 @@ class Game:
 
         #!!in export window
         self.ex_background = py.image.load(ob_resource +'ex_background.png')
-        self.ex_quit = Button('ex_quit', 607, 10, self.export_surf.pos)
+        self.ex_quit = Button('quit', 607, 10, self.export_surf.pos)
         self.ex_graph = Button('ex_graph', 52, 111, self.export_surf.pos)
         self.ex_value = Button('ex_value', 258, 111, self.export_surf.pos)
         self.ex_result = Button('ex_result', 464, 111, self.export_surf.pos)
@@ -346,6 +348,11 @@ class Game:
         self.export_surf.list_button = [self.ex_quit, self.ex_graph, self.ex_value, self.ex_result, self.ex_confirm]
         self.export_surf.list_intxt = [self.file_name]
         self.export_surf.list_optionbox = [self.file_type]
+
+        #!! in info window
+        self.info_background = py.image.load(ob_resource + 'info_background.png') 
+        self.info_quit = Button('quit', 607, 10, self.info_surf.pos)
+        self.info_surf.list_button = [self.info_quit]
       
     def __render_dp(self, but_check, ex_check):
         #!!main surface
@@ -355,6 +362,7 @@ class Game:
         self.start.blit(self.main_surf.surf, False)
         self.reset.blit(self.main_surf.surf, but_check[3])
         self.export.blit(self.main_surf.surf, but_check[2])
+        self.info.blit(self.main_surf.surf, but_check[4])
         self.main_surf.display()
 
         #!!graph surface & simulate surface
@@ -376,16 +384,22 @@ class Game:
             self.ex_result.blit(self.export_surf.surf, ex_check[2])
             self.ex_confirm.blit(self.export_surf.surf, False)
             self.export_surf.display()
+        #!!info surface
+        elif but_check[4]:
+            self.info_surf.surf.blit(self.info_background, (0,0))
+            self.info_quit.blit(self.info_surf.surf, False)
+            self.info_surf.display()
 
     def __update(self, event, but_check):
-        if not but_check[2]:
-            self.main_surf._Window__all_update(event)
-        else:
+        if but_check[2]:
             self.export_surf._Window__all_update(event)
+        elif but_check[4]:
+            self.info_surf._Window__all_update(event)
+        else: self.main_surf._Window__all_update(event)
 
     def __run(self):
         running = True
-        but_check = [False, False, False, False] #button angle, spring, export, check simulate
+        but_check = [False, False, False, False, False] #button angle, spring, export, check simulate, info
         ex_check = [False, False, False] #export window graph, value, result
         self.__setting()
        
@@ -443,13 +457,19 @@ class Game:
                         
                     elif self.export.mouse_click(event) and not but_check[2] and self.calculate.a != 0: #press export
                         but_check[2] = True
+                    
+                    elif self.info.mouse_click(event) and not but_check[2]: #press info
+                        but_check[4] = True
 
-                    elif self.ex_quit.mouse_click(event):
+                    if self.info_quit.mouse_click(event):
+                        but_check[4] = False
+
+                    if self.ex_quit.mouse_click(event):
                         but_check[2], ex_check = False, [False, False, False]
                         self.file_type.selected = 0
                         self.file_type.option_list = ['']
                         self.file_name.text = ''
-                    
+
                     elif but_check[2]:
                         if self.ex_graph.mouse_click(event): 
                             ex_check = [True, False, False]
