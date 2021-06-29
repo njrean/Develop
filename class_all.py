@@ -235,8 +235,8 @@ class Ball:
             self.pos_scale[1][1][i].draw(screen1, 'white')
         for i in self.list:
             py.draw.circle(screen1, (0, 0, 0), [404-335+(i[1]*self.ratio), 677.5-392-(i[2]*self.ratio)], 2)
-        surfaceball.surf.blit(self.ball, [413-surfaceball.pos[0]+(87*math.cos(self.a))+(self.pos.x*257.14), 277-surfaceball.pos[1]-(87*math.sin(self.a))-(self.pos.y*257)+(self.in_pos.y*257)])
-        surfaceball.surf.blit(self.basket, [413-14-surfaceball.pos[0]+(87*math.cos(self.a))+(distance*257.14), 245-surfaceball.pos[1]])
+        surfaceball.surf.blit(self.ball, [413-surfaceball.pos[0]+(87*math.cos(self.a))+(self.pos.x*257.14), 277-surfaceball.pos[1]-(87*math.sin(self.a))-(self.pos.y*257.14)+(self.in_pos.y*257.14)])
+        surfaceball.surf.blit(self.basket, [413-10-surfaceball.pos[0]+(107*math.cos(self.a))+(distance*257.14), 252-surfaceball.pos[1]])
 
 class ValueSet:
     def __init__(self, adjust = 0, distance = 0):
