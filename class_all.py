@@ -210,7 +210,7 @@ class Ball:
         surfaceball.surf.blit(self.ball, [413-surfaceball.pos[0]+(87*math.cos(self.a))+(self.pos.x*257.14), 277-surfaceball.pos[1]-(87*math.sin(self.a))-(self.pos.y*257)+(self.in_pos.y*257)])
         surfaceball.surf.blit(self.basket, [413-14-surfaceball.pos[0]+(87*math.cos(self.a))+(distance*257.14), 245-surfaceball.pos[1]])
 
-class ValuseSet:
+class ValueSet:
     def __init__(self, adjust = 0, distance = 0):
         self.adjust = adjust #angle or spring displacement
         self.d = distance   # distance
@@ -231,7 +231,7 @@ class ValuseSet:
     def set(self, adjust, d):
         self.adjust = adjust
         self.d = d
-        self.s,self.a,self.u1,self.u2,self.t,self.y0 = 0,0,0,0,0,0                                   
+        self.s,self.a,self.u1,self.u2,self.t,self.y0, self.ymax, self.xmax = 0,0,0,0,0,0,0,0                                   
     def find_angle(self): 
         self.s = self.adjust
         getx = 0
@@ -295,7 +295,7 @@ class Game:
         self.clock = py.time.Clock() #limit frame rate
         
     def __setting(self):
-        self.calculate = ValuseSet()
+        self.calculate = ValueSet()
         #!!own surface
         self.main_surf = Window(0, 0, 1165, 720, self.screen)
         self.graph_surf = Window(335, 387, 819, 324, self.screen)
@@ -432,13 +432,13 @@ class Game:
                             elif but_check[1] and adjust <= 0.17 and d <=  4:
                                 self.calculate.calculate(but_check[0], adjust, d, self.out_angle, self.out_displace, self.out_distance, self.out_velocity, self.out_time, self.out_xmax, self.out_ymax)
                                 but_check[3] =True
-                              
+                            
                     elif self.reset.mouse_click(event) and not but_check[2]: #press reset
                         but_check[:3] = [False, False, False]
                         but_check[3] = False
                         self.box_dis.text = ''
                         self.calculate.set(0, 0)
-                        self.calculate.ymax, self.calculate.xmax = 0, 0
+                        if 'ball' in dir(self.calculate): del self.calculate.ball
                         self.calculate.add_resualt(self.out_angle, self.out_displace, self.out_distance, self.out_velocity, self.out_time, self.out_xmax, self.out_ymax)
                         
                     elif self.export.mouse_click(event) and not but_check[2] and self.calculate.a != 0: #press export
