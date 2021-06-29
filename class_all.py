@@ -303,8 +303,10 @@ class ValueSet:
         txmax = ((self.u1*math.sin(self.a))+math.sqrt((self.u1*math.sin(self.a))**2+(2*9.81*self.y0)))/9.81
         self.xmax = self.u1*math.cos(self.a)*txmax
         self.ymax = self.y0+(self.u1*math.sin(self.a)*tymax)-(0.5*9.81*(tymax**2))
-        self.add_resualt(box_angle, box_displace, box_distance, box_velocity, box_time, box_xmax, box_ymax)
-        self.ball = Ball(0, self.y0, self.u1, self.a)
+        if self.xmax != 0: 
+            self.ball = Ball(0, self.y0, self.u1, self.a) 
+            self.add_resualt(box_angle, box_displace, box_distance, box_velocity, box_time, box_xmax, box_ymax)
+
     def get_all_value(self):
         tymax = self.u1*math.sin(self.a)/9.81
         txmax = ((self.u1*math.sin(self.a))+math.sqrt((self.u1*math.sin(self.a))**2+(2*9.81*self.y0)))/9.81
@@ -386,7 +388,7 @@ class Game:
         #!!main surface
         self.main_surf.surf.blit(self.main_background, (0, 0)) #background
         self.angle.blit(self.main_surf.surf ,but_check[0])
-        self.spring.blit(self.main_surf.surf, False)
+        self.spring.blit(self.main_surf.surf, but_check[1])
         self.start.blit(self.main_surf.surf, False)
         self.reset.blit(self.main_surf.surf, but_check[3])
         self.export.blit(self.main_surf.surf, but_check[2])
@@ -398,7 +400,7 @@ class Game:
         self.simulate_surf.surf.blit(self.simulate_background, (0, 0)) #Simulate background
         #!!shooter & ball
         self.calculate.shooter.draw(self.simulate_surf, int(self.calculate.a*180/math.pi))
-        if but_check[3] and self.calculate.shooter.cannon_status(int(self.calculate.a*180/math.pi)):
+        if but_check[3] and self.calculate.shooter.cannon_status(int(self.calculate.a*180/math.pi)) and 'ball' in dir(self.calculate):
             self.calculate.ball.blit(self.simulate_surf ,self.graph_surf.surf, self.calculate.d)
         self.graph_surf.display()
         self.simulate_surf.display()
@@ -428,7 +430,7 @@ class Game:
 
     def __run(self):
         running = True
-        but_check = [False, False, False, False, False] #button angle, spring, export, check simulate, info
+        but_check = [False, False, False, False, False, False] #button angle, spring, export, check simulate, info, start
         ex_check = [False, False, False] #export window graph, value, result
         self.__setting()
        
@@ -437,7 +439,7 @@ class Game:
                 self.box_ad.allow = True
                 if but_check[0]:
                     self.out_warning.text = 'Angle 15 to 80 degree' if self.box_unit2.selected == 0 else 'Angle 0.26 to 1.39 radius'
-                else: self.out_warning.text = 'Displacement 30 to 130 mm' if self.box_unit2.selected == 0 else 'Displacement 3 to 13 cm'
+                else: self.out_warning.text = 'Displacement 50 to 130 mm' if self.box_unit2.selected == 0 else 'Displacement 5 to 13 cm'
             else:
                 self.box_ad.allow = False
                 self.box_ad.text = ''
@@ -445,7 +447,7 @@ class Game:
                 self.box_unit2.unit_list = [1]
                 self.box_unit2.selected = 0
                 self.out_warning.text = 'Select Angle or Displacement'
-            
+
             for event in py.event.get():
                 self.__update(event, but_check)  
                 if event.type == py.MOUSEBUTTONDOWN:
@@ -466,13 +468,15 @@ class Game:
                             self.box_unit2.unit_list = [10**-3, 10**-2]
 
                     elif self.start.mouse_click(event) and not but_check[2]: #press start simulation
+                        but_check[5] = True
+                        if 'ball' in dir(self.calculate) : del self.calculate.ball
                         if (but_check[0] or but_check[1]) and self.box_ad.text != '' and self.box_dis.text != '':
                             adjust = float(self.box_ad.text)*self.box_unit2.unit_list[self.box_unit2.selected]
                             d = float(self.box_dis.text)*self.box_unit1.unit_list[self.box_unit1.selected]
                             if but_check[0] and math.pi/12 <= adjust <= math.pi/2 and d <= 4:
                                 self.calculate.calculate(but_check[0], adjust, d, self.out_angle, self.out_displace, self.out_distance, self.out_velocity, self.out_time, self.out_xmax, self.out_ymax)
                                 but_check[3] = True
-                            elif but_check[1] and adjust <= 0.17 and d <=  4:
+                            elif but_check[1] and 0.05 <= adjust <= 0.13 and 1 <= d <=  4:
                                 self.calculate.calculate(but_check[0], adjust, d, self.out_angle, self.out_displace, self.out_distance, self.out_velocity, self.out_time, self.out_xmax, self.out_ymax)
                                 but_check[3] =True
                             
@@ -494,7 +498,7 @@ class Game:
                         but_check[4] = False
 
                     if self.ex_quit.mouse_click(event):
-                        but_check[2], ex_check = False, [False, False, False]
+                        but_check[2],but_check[5], ex_check = False, False, [False, False, False]
                         self.file_type.selected = 0
                         self.file_type.option_list = ['']
                         self.file_name.text = ''
@@ -518,7 +522,7 @@ class Game:
                             elif ex_check[2]:
                                 list_result = [self.calculate.get_all_value()]
                                 savefile_append_row(self.file_name.text+self.file_type.option_list[self.file_type.selected], list_resutout, list_result)
-
+                    
                 elif event.type == py.QUIT:
                     py.quit()
                     exit()
