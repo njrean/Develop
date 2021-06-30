@@ -473,7 +473,7 @@ class Game:
                         if (but_check[0] or but_check[1]) and self.box_ad.text != '' and self.box_dis.text != '':
                             adjust = float(self.box_ad.text)*self.box_unit2.unit_list[self.box_unit2.selected]
                             d = float(self.box_dis.text)*self.box_unit1.unit_list[self.box_unit1.selected]
-                            if but_check[0] and math.pi/12 <= adjust <= math.pi/2 and d <= 4:
+                            if but_check[0] and math.pi/12 <= adjust <= 4*math.pi/9 and 1 <= d <= 4:
                                 self.calculate.calculate(but_check[0], adjust, d, self.out_angle, self.out_displace, self.out_distance, self.out_velocity, self.out_time, self.out_xmax, self.out_ymax)
                                 but_check[3] = True
                             elif but_check[1] and 0.05 <= adjust <= 0.13 and 1 <= d <=  4:
