@@ -184,14 +184,14 @@ class Cannon:
     def rotatepivoted(self, angle):
         image = py.transform.rotate(self.arm_cannon, angle)
         rect = image.get_rect()
-        rect.center = (414, 297)
+        rect.center = (391, 299)
         return image, rect
     def draw(self, surface, angle):
         if angle != self.angle:
             self.angle = self.angle + 1 if angle>self.angle else self.angle - 1
         (image, rect) = self.rotatepivoted(self.angle)
         surface.surf.blit(image, (rect.x-surface.pos[0],rect.y-surface.pos[1]))
-        surface.surf.blit(self.base_cannon, (373-surface.pos[0], 282-surface.pos[1]))
+        surface.surf.blit(self.base_cannon, (349-surface.pos[0], 284-surface.pos[1]))
 
 class Ball:
     def __init__(self, x=0, y=0, u=0, angle=0, timestep = 0.01):
@@ -235,8 +235,8 @@ class Ball:
             self.pos_scale[1][1][i].draw(screen1, 'white')
         for i in self.list:
             py.draw.circle(screen1, (0, 0, 0), [404-335+(i[1]*self.ratio), 677.5-392-(i[2]*self.ratio)], 2)
-        surfaceball.surf.blit(self.ball, [413-surfaceball.pos[0]+(87*math.cos(self.a))+(self.pos.x*257.14), 277-surfaceball.pos[1]-(87*math.sin(self.a))-(self.pos.y*257.14)+(self.in_pos.y*257.14)])
-        surfaceball.surf.blit(self.basket, [413-10-surfaceball.pos[0]+(107*math.cos(self.a))+(distance*257.14), 252-surfaceball.pos[1]])
+        surfaceball.surf.blit(self.ball, [391-6.5-surfaceball.pos[0]+(90.464*math.cos(self.a))+(self.pos.x*257), 299.5-6.5-surfaceball.pos[1]-(90.464*math.sin(self.a))-(self.pos.y*257)+(self.in_pos.y*257)])
+        surfaceball.surf.blit(self.basket, [391-29.5-surfaceball.pos[0]+(90.464*math.cos(self.a))+(distance*257), 249.5-surfaceball.pos[1]])
 
 class ValueSet:
     def __init__(self, adjust = 0, distance = 0):
